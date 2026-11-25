@@ -2,7 +2,7 @@
 
 Personal portfolio website for **Raj Patel** (Final-Year B.Tech IT Student · AI/ML & Data Science Enthusiast).
 
-## Features
+'''## Features
 - Responsive, recruiter-ready single-page layout (`index.html`, `styles.css`, `script.js`)
 - Dark / Light theme toggle persisted via `localStorage`
 - Interactive **Brain Tumor MRI Classifier (ViT-Base/16 + Grad-CAM)** pipeline explorer
@@ -24,4 +24,4 @@ Personal portfolio website for **Raj Patel** (Final-Year B.Tech IT Student · AI
    - **Source:** `Deploy from a branch`
    - **Branch:** `main` / `(root)`
    - Click **Save**.
-4. Your live site will be available at `https://<your-username>.github.io/<repo-name>/` within 1–2 minutes.
+4. Your live site will be available at `https://<your-username>.github.io/<repo-name>/` within 1–2 minutes.'''
