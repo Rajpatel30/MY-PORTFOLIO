@@ -80,27 +80,47 @@
     });
   });
 
-  // 5. Interactive ViT Pipeline Explorer
+  // 5. Interactive ViT Pipeline & Grad-CAM Explorer
   const classData = {
     glioma: {
+      label: "Glioma",
+      cx: "38%",
+      cy: "38%",
+      r: "34%",
+      probs: { glioma: 94, meningioma: 4, pituitary: 1, notumor: 1 },
       input: "Resized 224×224 MRI scan normalized for ViT-Base/16 patch embedding (16×16 patches).",
       model: "Two-phase fine-tuning with mixed-precision & class-balanced weights targeting Glioma morphology.",
       xai: "Grad-CAM + OpenCV heatmap highlights diffuse tumor boundaries inside brain parenchyma.",
       output: "Displays Predicted Class: <strong>Glioma</strong> · Confidence Score + Top-4 Probabilities."
     },
     meningioma: {
+      label: "Meningioma",
+      cx: "72%",
+      cy: "34%",
+      r: "30%",
+      probs: { glioma: 5, meningioma: 92, pituitary: 2, notumor: 1 },
       input: "Resized 224×224 MRI scan normalized for ViT-Base/16 patch embedding (16×16 patches).",
       model: "Two-phase fine-tuning extracts extra-axial dural-based mass features via self-attention.",
       xai: "Grad-CAM + OpenCV heatmap localizes well-circumscribed dural attachment regions.",
       output: "Displays Predicted Class: <strong>Meningioma</strong> · Confidence Score + Top-4 Probabilities."
     },
     pituitary: {
+      label: "Pituitary",
+      cx: "50%",
+      cy: "68%",
+      r: "26%",
+      probs: { glioma: 2, meningioma: 3, pituitary: 93, notumor: 2 },
       input: "Resized 224×224 MRI scan normalized for ViT-Base/16 patch embedding (16×16 patches).",
       model: "Two-phase fine-tuning focuses attention heads on sellar & suprasellar anatomical region.",
       xai: "Grad-CAM + OpenCV heatmap highlights focal pituitary gland region for clinician review.",
       output: "Displays Predicted Class: <strong>Pituitary</strong> · Confidence Score + Top-4 Probabilities."
     },
     notumor: {
+      label: "No Tumor",
+      cx: "50%",
+      cy: "50%",
+      r: "12%",
+      probs: { glioma: 1, meningioma: 1, pituitary: 1, notumor: 97 },
       input: "Resized 224×224 MRI scan normalized for ViT-Base/16 patch embedding (16×16 patches).",
       model: "Mixed-precision ViT inference confirms symmetric tissue distribution without mass effect.",
       xai: "Grad-CAM + OpenCV heatmap shows distributed baseline attention with no focal anomaly.",
@@ -113,6 +133,8 @@
   const stageModel = document.getElementById("stage-model");
   const stageXai = document.getElementById("stage-xai");
   const stageOutput = document.getElementById("stage-output");
+  const gradcamSpot = document.getElementById("gradcam-spot");
+  const probPredLabel = document.getElementById("prob-pred-label");
 
   classTabs.forEach((tab) => {
     tab.addEventListener("click", () => {
@@ -127,6 +149,20 @@
       if (stageModel) stageModel.textContent = data.model;
       if (stageXai) stageXai.textContent = data.xai;
       if (stageOutput) stageOutput.innerHTML = data.output;
+      if (probPredLabel) probPredLabel.textContent = data.label;
+
+      if (gradcamSpot) {
+        gradcamSpot.setAttribute("cx", data.cx);
+        gradcamSpot.setAttribute("cy", data.cy);
+        gradcamSpot.setAttribute("r", data.r);
+      }
+
+      Object.entries(data.probs).forEach(([cls, val]) => {
+        const bar = document.getElementById(`bar-${cls}`);
+        const pct = document.getElementById(`pct-${cls}`);
+        if (bar) bar.style.width = `${val}%`;
+        if (pct) pct.textContent = `${val}%`;
+      });
     });
   });
 
@@ -301,7 +337,27 @@
     }
   });
 
-  // 10. Footer Year
+  // 10. Scroll Progress Bar, Floating Back-to-Top & Print CV
+  const scrollProgress = document.getElementById("scroll-progress");
+  const floatingTopBtn = document.getElementById("floating-top-btn");
+  const printCvBtn = document.getElementById("print-cv-btn");
+
+  window.addEventListener("scroll", () => {
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
+    if (scrollProgress) scrollProgress.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+    if (floatingTopBtn) floatingTopBtn.classList.toggle("show", window.scrollY > 420);
+  }, { passive: true });
+
+  floatingTopBtn?.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  printCvBtn?.addEventListener("click", () => {
+    window.print();
+  });
+
+  // 11. Footer Year
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 })();
